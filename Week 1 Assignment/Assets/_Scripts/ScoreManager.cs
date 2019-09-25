@@ -2,15 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScoreManager
+public class ScoreManager : Subject
 {
     public int score = 0;
+    public Observer displayScore;
 
-    public static ScoreManager instance = new ScoreManager();
-
-    private ScoreManager()
+    private void Start()
     {
+        registerObserver(displayScore);
+    }
 
+    public void updateScore(int point)
+    {
+        score += point;
+        Notify(score, NotificationType.ScoreUpdated);
     }
 
 }

@@ -5,10 +5,12 @@ using UnityEngine;
 public class CannonControl : MonoBehaviour
 {
     public GameObject piggyPlayer;
-    public float strength = 500; //the scalar that defines the strength of the cannon launch
+    public float strength = 800; //the scalar that defines the strength of the cannon launch
     Vector3 direction;
     const int MAX_ANGLE = 80;
     const int MIN_ANGLE = 5;
+
+    public Animator camAnim;
 
     // Start is called before the first frame update
     void Start()
@@ -34,11 +36,13 @@ public class CannonControl : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (Input.GetMouseButtonUp(0))
+        if ((piggyPlayer.transform.IsChildOf(transform)) && (Input.GetMouseButtonUp(0)))
         {
             piggyPlayer.transform.parent = null;
             piggyPlayer.GetComponent<Rigidbody2D>().gravityScale = 1;
             piggyPlayer.GetComponent<Rigidbody2D>().AddForce(direction * strength);
+
+            camAnim.enabled = false;
         }
     }
 }

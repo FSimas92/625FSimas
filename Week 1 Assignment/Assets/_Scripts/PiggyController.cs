@@ -1,42 +1,63 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PiggyController : MonoBehaviour
 {
     Vector3 startPosition;
     Quaternion startRotation;
     Transform cannon;
-    const int waitTime = 3;
+    public ScoreManager scoreManager;
+    public LevelManager levelManager;
+    const int WAIT_TIME = 3;
+    bool resetting = false;
+    public static int kingHits = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        startPosition = transform.position;
-        startRotation = transform.rotation;
         cannon = transform.parent;
-
+        startPosition = transform.localPosition;
+        startRotation = transform.localRotation;
+        levelManager.updateLevel(1);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (kingHits >= 3)
+        {
+            SceneManager.LoadScene("VictoryScene");
+        }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        ScoreManager.instance.score++;
+        scoreManager.updateScore(1);
+        if (!resetting)
+        {
+            Invoke("ResetPiggy", 4);
+            resetting = true;
+        }
 
-        StartCoroutine("ResetPiggy");
+        if (collision.gameObject.tag == "King")
+        {
+            Debug.Log("hitKing");
+            kingHits = kingHits + 1;
+        }
     }
 
-    IEnumerator ResetPiggy()
+    void ResetPiggy()
     {
-        yield return new WaitForSeconds(waitTime);
-        transform.position = startPosition;
-        transform.rotation = startRotation;
+        transform.parent = cannon;
+        transform.localPosition = startPosition;
+        transform.localRotation = startRotation;
         GetComponent<Rigidbody2D>().gravityScale = 0;
-        transform.parent = cannon.transform;
+        GetComponent<Rigidbody2D>().velocity = new Vector3(0, 0);
+        GetComponent<Rigidbody2D>().angularVelocity = 0;
+        levelManager.updateLevel(1);
+        resetting = false;
     }
 }
