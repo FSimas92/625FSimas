@@ -15,18 +15,23 @@ public class TerrainGenerator : MonoBehaviour
     Texture2D image;
     Terrain terrain;
 
+    float offset1 = 0f;
+    float offset2 = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
         terrain = GetComponent<Terrain>();
         image = new Texture2D(terrain.terrainData.heightmapWidth, terrain.terrainData.heightmapHeight);
-        image.LoadImage(File.ReadAllBytes("Assets/mt-taranaki.png"));
+        image.LoadImage(File.ReadAllBytes("Assets/Height Maps/lucas-donderis.jpeg"));
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        offset1 += (Input.GetAxis("Horizontal") / 4);
+        offset2 += (Input.GetAxis("Vertical") / 4);
+
         float[,] heightmap = terrain.terrainData.GetHeights(0, 0, terrain.terrainData.heightmapWidth, terrain.terrainData.heightmapHeight);
         
         for (int i=0; i < terrain.terrainData.heightmapHeight; ++i)
@@ -37,20 +42,19 @@ public class TerrainGenerator : MonoBehaviour
                 float y = i / (float) terrain.terrainData.heightmapHeight;
                 float height = image.GetPixel(i, j).b;
 
-                /* Perlin noise version
+                
                 float current_frequency = frequency;
-                float height = 0f;
                 float amplitude = 1;
                 for (int z = 0; z < octaves; ++z)
                 {
-                    height = height + Mathf.PerlinNoise(x * current_frequency, y * current_frequency) * amplitude;
+                    height = height + Mathf.PerlinNoise(x * current_frequency + offset1, y * current_frequency + offset2) * amplitude;
+                    amplitude /= 2;
                     current_frequency *= 2;
                 }
                 
 
-                float heightP = Mathf.PerlinNoise(x * frequency, y * flatness);
-                heightmap[i, j] = height / flatness + Random.Range(0f, 0.1f);
-                */
+                heightmap[i, j] = height / flatness;
+                
             }
         }
 
